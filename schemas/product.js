@@ -7,7 +7,10 @@ var productSchema = new mongoose.Schema({
         required: true
     },
     descripsion: String,
-    price: Number,
+    price: {
+        type: Number,
+        require: true
+    },
     status: String,
     image: String,
     category: {
