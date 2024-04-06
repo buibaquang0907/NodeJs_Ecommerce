@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var authRouter = require('./routes/auth');
 
 var app = express();
 
@@ -22,6 +23,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/auth', authRouter);
+app.get('/login', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'login.html'));
+});
+app.get('/register', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'register.html'));
+});
+app.get('/home', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'home.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

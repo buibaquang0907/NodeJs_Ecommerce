@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center mt-5">Register</h2>
+                <div class="card my-5">
+                    <form id="registerForm" class="card-body">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" class="form-control" required>
+                            <div id="usernameError" class="text-danger"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" id="email" class="form-control" required>
+                            <div id="emailError" class="text-danger"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" class="form-control" required>
+                            <div id="passwordError" class="text-danger"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="passwordconfirm">Password Confirm</label>
+                            <input type="password" id="passwordconfirm" class="form-control" required>
+                            <div id="passwordConfirmError" class="text-danger"></div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-block">Register</button>
+                        <button onclick="window.location.href = '/login'" class="btn btn-primary btn-block">Login</button>
+                    </form>
+                </div>
+                <div id="message" class="text-center"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+    $('#registerForm').on('submit', function(e) {
+        e.preventDefault();
+
+        // Clear previous error messages
+        clearErrors();
+
+        // Validate fields
+        var isUsernameValid = validateUsername($('#username').val());
+        var isEmailValid = validateEmail($('#email').val());
+        var isPasswordValid = validatePassword($('#password').val());
+        var isPasswordConfirmValid = validatePasswordConfirm($('#password').val(), $('#passwordconfirm').val());
+
+        // Check if all validations passed
+        if (isUsernameValid && isEmailValid && isPasswordValid && isPasswordConfirmValid) {
+            // If all validations pass, submit the form data
+            submitFormData();
+        }
+    });
+
+    function clearErrors() {
+        $('#usernameError').text('');
+        $('#emailError').text('');
+        $('#passwordError').text('');
+        $('#passwordConfirmError').text('');
+    }
+
+    function validateUsername(username) {
+        if (username.length < 8 || username.length > 42) {
+            $('#usernameError').text('Username must be between 8 and 42 characters.');
+            return false;
+        }
+        return true;
+    }
+
+    function validateEmail(email) {
+        var regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+        if (!regex.test(email)) {
+            $('#emailError').text('Email must be a valid email address.');
+            return false;
+        }
+        return true;
+    }
+
+    function validatePassword(password) {
+        var regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/; // Adjust regex based on your requirements
+        if (!regex.test(password)) {
+            $('#passwordError').text('Password must meet the requirements.');
+            return false;
+        }
+        return true;
+    }
+
+    function validatePasswordConfirm(password, confirmPassword) {
+        if (password !== confirmPassword) {
+            $('#passwordConfirmError').text('Passwords do not match.');
+            return false;
+        }
+        return true;
+    }
+
+    function submitFormData() {
+        $.ajax({
+            url:'/api/v1/auth/register',
+            type:'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                username: $('#username').val(),
+                email: $('#email').val(),
+                password: $('#password').val(),
+            }),
+            success: function(data) {
+                $('#message').html('<div class="alert alert-success">Registration successful. Redirecting...</div>');
+                console.log(data);
+                window.location.href = '/login';
+            },
+            error: function(xhr) {
+                var response = JSON.parse(xhr.responseText);
+                $('#message').html('<div class="alert alert-danger">' + response.data + '</div>');
+                console.error(response.data);
+            }
+        });
+    }
+});
+
+    </script>
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

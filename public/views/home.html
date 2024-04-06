@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <!-- Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Products</h2>
+        <div id="products" class="row"></div> <!-- Products will be inserted here -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: '/api/v1/products', // Make sure this matches your actual API endpoint
+                type: 'GET',
+                success: function (response) {
+                    // Check if the call was successful and there is data
+                    if (response.success && response.data && response.data.length > 0) {
+                        response.data.forEach(function (product) {
+                            var productHtml = '<div class="col-md-4 mb-3">' +
+                                '<div class="card">' +
+                                (product.image ? '<img src="' + product.image + '" width="200" height="200" class="card-img-top" alt="' + product.name + '">' : '') +
+                                '<div class="card-body">' +
+                                '<h5 class="card-title">' + product.name + '</h5>' +
+                                '<p class="card-text">' + (product.descripsion || 'No description available') + '</p>' +
+                                '<p class="card-text">Price: $' + product.price + '</p>' +
+                                '<button class="btn btn-primary addToCart" data-id="' + product._id + '">Add to Cart</button>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>';
+                            $('#products').append(productHtml);
+                        });
+
+                        // Here you could also initialize any click event listeners for the "Add to Cart" buttons
+                    } else {
+                        $('#products').html('<p>No products found or failed to load products.</p>');
+                    }
+                },
+                error: function (request, status, error) {
+                    $('#products').html('<p>Error fetching products. Please make sure you are authorized.</p>');
+                }
+            });
+        });
+        function addToCart(productId, quantity) {
+                let cart = JSON.parse(localStorage.getItem('cart')) || [];
+                let productIndex = cart.findIndex(item => item.id === productId);
+
+                if (productIndex !== -1) {
+                    // Sản phẩm đã tồn tại trong giỏ, cập nhật số lượng
+                    cart[productIndex].quantity += quantity;
+                } else {
+                    // Thêm sản phẩm mới vào giỏ
+                    cart.push({ id: productId, quantity: quantity });
+                }
+
+                // Lưu giỏ hàng trở lại localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
+
+            // Gắn sự kiện click cho các nút "Add to Cart"
+            $(document).on('click', '.addToCart', function () {
+                    let productId = $(this).data('id');
+                    addToCart(productId, 1); // Thêm sản phẩm với số lượng 1 vào giỏ hàng
+                    alert("Product added to cart!"); // Hiển thị thông báo cho người dùng
+                });
+
+
+    </script>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

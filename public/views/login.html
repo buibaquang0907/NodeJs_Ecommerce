@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="text-center mt-5">Login</h2>
+                <div class="card my-5">
+                    <form id="loginForm" class="card-body">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Login</button>
+                        <button onclick="window.location.href = '/register'" class="btn btn-primary btn-block">Register</button>
+                    </form>
+                </div>
+                <div id="message" class="text-center"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url:'/api/v1/auth/login',
+                    type:'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: $('#email').val(),
+                        password: $('#password').val(),
+                    }),
+                    success: function(data) {
+                        $('#message').html('<div class="alert alert-success">Login successful. Redirecting...</div>');
+                        console.log(data);
+                        //window.location.href = '/register';
+                    },
+                    error: function(xhr, status, error) {
+                        // Parse the response JSON to get the "data" field
+                        var response = JSON.parse(xhr.responseText);
+                        $('#message').html('<div class="alert alert-danger">Login failed: ' + response.data + '</div>');
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

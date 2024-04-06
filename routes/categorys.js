@@ -22,7 +22,7 @@ router.post('/', async function (req, res, next) {
     try {
         var newCategory = new categoryModel({
             name: req.body.name,
-            image:req.body.image
+            image:req.body.image,
         })
         await newCategory.save();
         responseReturn.ResponseSend(res, true, 200, newCategory)

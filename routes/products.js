@@ -4,11 +4,13 @@ var responseReturn = require('../helper/ResponseHandle');
 const product = require('../schemas/product');
 var productModel = require('../schemas/product');
 var categoryModel = require('../schemas/category');
-
-router.get('/', async function (req, res, next) {
-    var product = await productModel.find({}).exec();
-    responseReturn.ResponseSend(res, true, 200, product)
-});
+const protect = require('../middleware/protect');
+const checkRole = require('../middleware/checkRole');
+    router.get('/',protect, checkRole("admin"), async function (req, res, next) {
+        var product = await productModel.find({}).exec();
+        responseReturn.ResponseSend(res, true, 200, product)
+        //res.render('home',{product})
+    });
 
 router.get('/:id', async function (req, res, next) {
     try {
@@ -25,6 +27,7 @@ router.post('/', async function (req, res, next) {
             name: req.body.name,
             descripsion: req.body.descripsion,
             price:req.body.price,
+            category:req.body.category,
             status:req.body.status,
             image:req.body.image
         })
