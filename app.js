@@ -33,6 +33,9 @@ app.get('/register', function(req, res) {
 app.get('/home', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'home.html'));
 });
+app.get('/cart', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'cart.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

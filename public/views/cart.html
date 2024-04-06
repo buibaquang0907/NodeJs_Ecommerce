@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img-top {
+            max-height: 250px;
+            object-fit: cover;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-controls input {
+            width: 50px;
+            text-align: center;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .btn {
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+
+        #totalPrice {
+            font-weight: bold;
+            font-size: 20px;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Your Cart</h2>
+        <div id="cartItems" class="row"></div>
+        <h4 class="mt-4">Total: $<span id="totalPrice">0</span></h4>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        $(document).ready(function () {
+            updateCartUI();
+
+            $(document).on('click', '.increase, .decrease', function () {
+                const productId = $(this).data('id');
+                const isIncrease = $(this).hasClass('increase');
+                updateQuantity(productId, isIncrease);
+            });
+
+            $('.removeFromCart').click(function () {
+                const productId = $(this).data('id');
+                removeFromCart(productId);
+            });
+        });
+
+        function updateCartUI() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let productsHtml = '';
+            let totalPrice = 0;
+
+            if (cart.length > 0) {
+                cart.forEach(function (item) {
+                    const itemTotal = item.price * item.quantity;
+                    totalPrice += itemTotal;
+
+                    productsHtml += `<div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        ${item.image ? `<img src="${item.image}" class="card-img-top" style="width: 100%; height: auto;">` : ''}
+                                        <div class="card-body">
+                                            <h5 class="card-title">${item.name}</h5>
+                                            <p class="card-text">Description: ${item.description}</p>
+                                            <p class="card-text">Price: $${item.price}</p>
+                                            <div class="quantity-controls">
+                                                <button class="btn btn-secondary decrease" data-id="${item.id}">-</button>
+                                                <input type="text" value="${item.quantity}" readonly>
+                                                <button class="btn btn-secondary increase" data-id="${item.id}">+</button>
+                                            </div>
+                                            <p class="card-text">Total: $${itemTotal.toFixed(2)}</p>
+                                            <button class="btn btn-danger removeFromCart" data-id="${item.id}">Remove from Cart</button>
+                                        </div>
+                                    </div>
+                                </div>`;
+                });
+            } else {
+                productsHtml = '<p>Your cart is empty.</p>';
+            }
+
+            $('#cartItems').html(productsHtml);
+            $('#totalPrice').text(totalPrice.toFixed(2));
+        }
+
+        function updateQuantity(productId, isIncrease) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const productIndex = cart.findIndex(item => item.id === productId);
+
+            if (productIndex !== -1) {
+                if (isIncrease) {
+                    cart[productIndex].quantity += 1;
+                } else if (cart[productIndex].quantity > 1) {
+                    cart[productIndex].quantity -= 1;
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                updateCartUI();
+            }
+        }
+
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+        }
+
+        $(function () {
+            $("#navbar-placeholder").load("./views/layout/navbar.html");
+            $("#footer-placeholder").load("./views/layout/footer.html");
+        });
+    </script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
