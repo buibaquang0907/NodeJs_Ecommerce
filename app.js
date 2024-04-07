@@ -41,6 +41,13 @@ app.get('/users', function(req, res) {
 app.get('/edit-user/:i', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'edit-user.html'));
 });
+app.get('/order', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'order.html'));
+});
+app.get('/checkout', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'checkout.html'));
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

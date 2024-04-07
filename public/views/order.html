@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order List</title>
+    <!-- Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Orders</h2>
+        <div id="orders" class="row"></div> <!-- Orders will be inserted here -->
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/v1/orders', // Make sure this matches your actual API endpoint for orders
+                type: 'GET',
+                success: function (response) {
+                    if (response.success && response.data && response.data.length > 0) {
+                        response.data.forEach(function (order) {
+                            var orderHtml = '<div class="col-md-4 mb-3">' +
+                                '<div class="card">' +
+                                '<div class="card-body">' +
+                                '<h5 class="card-title">Order ID: ' + order._id + '</h5>' +
+                                '<p class="card-text">Total Price: $' + order.totalPrice + '</p>' +
+                                '<p class="card-text">Payment: ' + order.payment + '</p>' +
+                                '<p class="card-text">Shipping Address: ' + order.shippingAddress + '</p>' +
+                                '<p class="card-text">Date Ordered: ' + order.dateOrder + '</p>' +
+                                '<p class="card-text">Status: ' + order.status + '</p>' +
+                                '</div>' +
+                                '</div>' +
+                                '</div>';
+                            $('#orders').append(orderHtml);
+                        });
+                    } else {
+                        $('#orders').html('<p>No orders found or failed to load orders.</p>');
+                    }
+                },
+                error: function (request, status, error) {
+                    $('#orders').html('<p>Error fetching orders. Please make sure you are authorized.</p>');
+                }
+            });
+        });
+
+        $(function () {
+            $("#navbar-placeholder").load("./views/layout/navbar.html");
+            $("#footer-placeholder").load("./views/layout/footer.html");
+        });
+    </script>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
