@@ -31,7 +31,7 @@
                         response.data.forEach(function (product) {
                             var productHtml = '<div class="col-md-4 mb-3">' +
                                 '<div class="card">' +
-                                (product.image ? '<img src="' + product.image + '" class="card-img-top" alt="' + product.name + '" style="width: 100%; height: auto;">' : '') +
+                                (product.image ? '<img src="' + product.image + '" class="card-img-top mx-auto d-block" alt="' + product.name + '" style="width: 200px; height: 200px; object-fit: cover;">' : '') +
                                 '<div class="card-body">' +
                                 '<h5 class="card-title">' + product.name + '</h5>' +
                                 '<p class="card-text">' + (product.descripsion || 'No description available') + '</p>' +
@@ -78,7 +78,6 @@
             alert("Product added to cart!"); // Show a message to the user
         });
 
-
     </script>
 
     <script>
@@ -87,10 +86,6 @@
             $("#footer-placeholder").load("./views/layout/footer.html");
         });
     </script>
-
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

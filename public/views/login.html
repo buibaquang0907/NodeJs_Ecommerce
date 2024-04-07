@@ -46,7 +46,7 @@
                     success: function(data) {
                         $('#message').html('<div class="alert alert-success">Login successful. Redirecting...</div>');
                         console.log(data);
-                        //window.location.href = '/register';
+                        window.location.href = '/home';
                     },
                     error: function(xhr, status, error) {
                         // Parse the response JSON to get the "data" field

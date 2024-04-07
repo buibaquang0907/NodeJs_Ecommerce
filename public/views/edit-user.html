@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="card" style="width: 30rem;">
+            <div class="card-body">
+                <h2 class="card-title">Edit User</h2>
+                <form id="editUserForm">
+                    <!-- Form fields for editing a user -->
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" class="form-control" id="username" name="username">
+                    </div>
+                    <div hidden readonly class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" class="form-control" id="phone" name="phone">
+                        <div id="phoneError" class="text-danger"></div> <!-- Thêm phần tử hiển thị lỗi cho trường Phone -->
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address">
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image Address</label>
+                        <input type="text" class="form-control" id="image" name="image">
+                    </div>
+                    <div hidden readonly class="form-group">
+                        <label for="password">Password</label>
+                        <input hidden readonly type="password" class="form-control" id="password" name="password">
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    <a href="/users" class="btn btn-danger">Back to Users</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script>
+        $(document).ready(function () {
+            var userId = window.location.pathname.split('/').pop();
+            $.ajax({
+                url: '/api/v1/users/' + userId,
+                type: 'GET',
+                success: function (response) {
+                    if (response.success && response.data) {
+                        $('#userId').val(response.data._id);
+                        $('#username').val(response.data.username);
+                        $('#email').val(response.data.email);
+                        $('#phone').val(response.data.phone);
+                        $('#address').val(response.data.address);
+                        $('#image').val(response.data.image);
+                        $('#password').val(response.data.password);
+                    }
+                },
+                error: function () {
+                    alert('Failed to fetch user data.');
+                }
+            });
+
+            $('#editUserForm').submit(function (e) {
+                e.preventDefault();
+                clearErrors(); // Gọi hàm để xóa các thông báo lỗi cũ
+
+                var userData = {
+                    username: $('#username').val(),
+                    phone: $('#phone').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    address: $('#address').val(),
+                    image: $('#image').val(),
+                };
+
+                var isPhoneValid = validatePhone($('#phone').val());
+                if (!isPhoneValid) return; 
+
+                $.ajax({
+                    url: '/api/v1/users/' + userId,
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(userData),
+                    success: function () {
+                        alert('User updated successfully.');
+                        window.location.href = '/users'; // Redirect back to the listing page
+                    },
+                    error: function (request) {
+                        var response = JSON.parse(request.responseText);
+                        if (response.data && response.data.code === 11000) {
+                            var errorField = Object.keys(response.data.keyPattern)[0];
+                            var fieldValue = response.data.keyValue[errorField];
+                            var errorMessage = `The ${errorField} "${fieldValue}" is already in use.`;
+                            $('#' + errorField + 'Error').text(errorMessage);
+                        } else {
+                            alert('An unexpected error occurred.');
+                        }
+                    }
+                });
+            });
+
+            function clearErrors() {
+                $('.text-danger').text(''); // Xóa tất cả các thông báo lỗi
+            }
+
+            function validatePhone(phone) {
+                var regex = /^\d{10,11}$/;
+                if (!regex.test(phone)) {
+                    $('#phoneError').text('Phone number must be 10 to 11 digits.');
+                    return false;
+                }
+                return true;
+            }
+
+
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $("#navbar-placeholder").load("../views/layout/navbar.html");
+            $("#footer-placeholder").load("../views/layout/footer.html");
+        });
+    </script>
+</body>
+
+</html>

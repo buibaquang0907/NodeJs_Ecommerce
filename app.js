@@ -22,7 +22,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.get('/login', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'login.html'));
@@ -36,7 +35,12 @@ app.get('/home', function(req, res) {
 app.get('/cart', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'cart.html'));
 });
-
+app.get('/users', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'users.html'));
+});
+app.get('/edit-user/:i', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'edit-user.html'));
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

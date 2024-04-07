@@ -97,28 +97,12 @@ router.post('/ResetPassword/:token', async function (req, res, next) {
     next(error); 
   }
 });
-// router.post('/ResetPassword/:token', async function (req, res, next) {
-//   let user = await userModel.findOne({
-//     ResetPasswordToken: req.params.token
-//   })
-//   if (!user) {
-//     ResHelper.ResponseSend(res, false, 404, "URL khong dung");
-//     return;
-//   }
-//   if (user.ResetPasswordExp > Date.now()) {
-//     user.password = req.body.password;
-//   }
-//   user.ResetPasswordExp = undefined;
-//   user.ResetPasswordToken = undefined;
-//   await user.save();
-//   ResHelper.ResponseSend(res, true, 200, "Doi password thanh cong")
-// });
 
 router.post('/logout', async function (req, res, next) {
   res.status(200).cookie('token', "null", {
     expires: new Date(Date.now + 1000),
     httpOnly: true
-  }).send("ban da dang xuat");
+  }).send("Bạn đã đăng xuất!");
 });
 
 
@@ -126,12 +110,12 @@ router.post('/login', async function (req, res, next) {
   let email = req.body.email;
   let password = req.body.password;
   if (!email || !password) {
-    ResHelper.ResponseSend(res, false, 404, 'username va password phai dien day du');
+    ResHelper.ResponseSend(res, false, 404, 'Email hoặc Mật khẩu không được bỏ trống!');
     return;
   }
   let user = await userModel.findOne({ email: email });
   if (!user) {
-    ResHelper.ResponseSend(res, false, 404, 'username hoac password khong dung');
+    ResHelper.ResponseSend(res, false, 404, 'Email hoặc Mật khẩu không đúng!');
     return;
   }
   var checkpass = bcrypt.compareSync(password, user.password);
@@ -143,9 +127,8 @@ router.post('/login', async function (req, res, next) {
       success: true,
       data: user.getJWT()
     })
-    //ResHelper.ResponseSend(res, true, 200, user.getJWT());
   } else {
-    ResHelper.ResponseSend(res, false, 404, 'username hoac password khong dung');
+    ResHelper.ResponseSend(res, false, 404, 'Email hoặc Mật khẩu không đúng!');
   }
 });
 router.post('/register', Validator.UserValidate(), async function (req, res, next) {
@@ -159,6 +142,8 @@ router.post('/register', Validator.UserValidate(), async function (req, res, nex
       username: req.body.username,
       password: req.body.password,
       email: req.body.email,
+      phone: req.body.phone,
+      address: "unknown",
       role: ['USER']
     })
     await newUser.save();

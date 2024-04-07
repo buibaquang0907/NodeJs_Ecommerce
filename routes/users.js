@@ -15,12 +15,15 @@ router.get('/', protect, checkRole("admin"),
 
 router.get('/:id', protect, async function (req, res, next) {
   try {
-    let user = await userModel.find({ _id: req.params.id }).exec();
-    ResHelper.RenderRes(res, true, 200, user)
+    let user = await userModel.findById(req.params.id).exec();
+    // Ensure ResHelper.ResponseSend is the correct method
+    ResHelper.ResponseSend(res, true, 200, user);
   } catch (error) {
-    ResHelper.ResponseSend(res, false, 404, error)
+    // Make sure to handle the error appropriately
+    ResHelper.ResponseSend(res, false, 404, error.message);
   }
 });
+
 
 router.post('/', Validator.UserValidate(), async function (req, res, next) {
   try {
@@ -30,14 +33,14 @@ router.post('/', Validator.UserValidate(), async function (req, res, next) {
     }
 
     const newUser = new userModel({
-        username: req.body.username,
-        password: req.body.password,
-        address: req.body.address,
-        phone: req.body.phone,
-        email: req.body.email,
-        image: req.body.image,
-        role: ['USER']
-    }); 
+      username: req.body.username,
+      password: req.body.password,
+      address: req.body.address,
+      phone: req.body.phone,
+      email: req.body.email,
+      image: req.body.image,
+      role: ['USER']
+    });
 
     await newUser.save();
     return ResHelper.ResponseSend(res, true, 200, newUser);
@@ -52,8 +55,13 @@ router.put('/:id', async function (req, res, next) {
   try {
     let user = await userModel.findById
       (req.params.id).exec()
-    user.email = req.body.email;
-    await user.save()
+      user.email = req.body.email;
+      user.username = req.body.username,
+      user.password = req.body.password,
+      user.address = req.body.address,
+      user.phone = req.body.phone,
+      user.image = req.body.image,
+      await user.save()
     ResHelper.ResponseSend(res, true, 200, user);
   } catch (error) {
     ResHelper.ResponseSend(res, false, 404, error)
@@ -63,18 +71,19 @@ router.put('/:id', async function (req, res, next) {
 
 router.delete('/:id', async function (req, res, next) {
   try {
-    let user = await userModel.findByIdAndUpdate
-      (req.params.id, {
-        status: false
-      }, {
-        new: true
-      }).exec()
+    let user = await userModel.findByIdAndUpdate(
+      req.params.id,
+      { isDelete: true }, // Make sure this field name matches your schema
+      { new: true }
+    ).exec();
+
     ResHelper.ResponseSend(res, true, 200, user);
   } catch (error) {
-    ResHelper.ResponseSend(res, false, 404, error)
+    ResHelper.ResponseSend(res, false, 404, error);
   }
 });
-router.post('/forgotpassword', async function(req, res, next) {
+
+router.post('/forgotpassword', async function (req, res, next) {
   try {
     const { email } = req.body;
     const user = await userModel.findOne({ email });
@@ -96,7 +105,7 @@ router.post('/forgotpassword', async function(req, res, next) {
   }
 });
 
-router.post('/resetpassword', async function(req, res, next) {
+router.post('/resetpassword', async function (req, res, next) {
   try {
     const { token, newPassword } = req.body;
     const user = await userModel.findOne({ ResetPasswordToken: token });
@@ -117,7 +126,7 @@ router.post('/resetpassword', async function(req, res, next) {
   }
 });
 
-router.put('/changepassword', protect, async function(req, res, next) {
+router.put('/changepassword', protect, async function (req, res, next) {
   try {
     const { oldPassword, newPassword } = req.body;
     const user = req.user;

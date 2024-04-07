@@ -26,6 +26,11 @@
                             <div id="emailError" class="text-danger"></div>
                         </div>
                         <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="text" id="phone" class="form-control" required>
+                            <div id="phoneError" class="text-danger"></div>
+                        </div>
+                        <div class="form-group">
                             <label for="password">Password</label>
                             <input type="password" id="password" class="form-control" required>
                             <div id="passwordError" class="text-danger"></div>
@@ -57,10 +62,8 @@
         var isEmailValid = validateEmail($('#email').val());
         var isPasswordValid = validatePassword($('#password').val());
         var isPasswordConfirmValid = validatePasswordConfirm($('#password').val(), $('#passwordconfirm').val());
-
-        // Check if all validations passed
-        if (isUsernameValid && isEmailValid && isPasswordValid && isPasswordConfirmValid) {
-            // If all validations pass, submit the form data
+        var isPhoneValid = validatePhone($('#phone').val()); 
+        if (isUsernameValid && isEmailValid && isPhoneValid && isPasswordValid && isPasswordConfirmValid) {
             submitFormData();
         }
     });
@@ -97,6 +100,15 @@
         }
         return true;
     }
+    function validatePhone(phone) {
+    var regex = /^\d{10,11}$/;
+    if (!regex.test(phone)) {
+        $('#phoneError').text('Phone number must be 10 to 11 digits.');
+        return false;
+    }
+    return true;
+    }
+
 
     function validatePasswordConfirm(password, confirmPassword) {
         if (password !== confirmPassword) {
@@ -107,28 +119,39 @@
     }
 
     function submitFormData() {
-        $.ajax({
-            url:'/api/v1/auth/register',
-            type:'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                username: $('#username').val(),
-                email: $('#email').val(),
-                password: $('#password').val(),
-            }),
-            success: function(data) {
-                $('#message').html('<div class="alert alert-success">Registration successful. Redirecting...</div>');
-                console.log(data);
-                window.location.href = '/login';
-            },
-            error: function(xhr) {
-                var response = JSON.parse(xhr.responseText);
-                $('#message').html('<div class="alert alert-danger">' + response.data + '</div>');
-                console.error(response.data);
+    $.ajax({
+        url:'/api/v1/auth/register',
+        type:'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            username: $('#username').val(),
+            email: $('#email').val(),
+            phone: $('#phone').val(), // Đảm bảo bạn đã thêm trường phone vào dữ liệu gửi đi
+            password: $('#password').val(),
+        }),
+        success: function(data) {
+            $('#message').html('<div class="alert alert-success">Registration successful. Redirecting...</div>');
+            console.log(data);
+            window.location.href = '/login'; // Đảm bảo đường dẫn đến trang đăng nhập là đúng
+        },
+        error: function(xhr) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.data && response.data.code === 11000) {
+                var fieldName = Object.keys(response.data.keyPattern)[0]; // Lấy tên trường gây ra lỗi
+                var fieldValue = response.data.keyValue[fieldName];
+                var errorMessage = `The ${fieldName} "${fieldValue}" is already in use.`;
+                $(`#${fieldName}Error`).text(errorMessage); // Hiển thị thông báo lỗi ngay bên dưới trường nhập liệu tương ứng
+                $('#message').html('<div class="alert alert-danger">' + errorMessage + '</div>'); // Cũng hiển thị lỗi chung ở một vị trí cố định nếu cần
+            } else {
+                $('#message').html('<div class="alert alert-danger">An unexpected error occurred.</div>');
             }
-        });
-    }
-});
+        }
+    });
+}
+
+}
+
+);
 
     </script>
     <!-- Bootstrap JS and Popper.js -->
