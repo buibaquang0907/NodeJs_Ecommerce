@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
 </head>
+
 <body>
     <div id="navbar-placeholder"></div>
 
@@ -25,40 +27,42 @@
     <div id="footer-placeholder"></div>
 
     <script>
-    $(document).ready(function () {
-        var usersPerPage = 3;
-        var currentPage = 1;
-        var users = [];
+        $(document).ready(function () {
+            var usersPerPage = 3;
+            var currentPage = 1;
+            var users = [];
 
-        function fetchUsers() {
-            $.ajax({
-                url: '/api/v1/users/',
-                type: 'GET',
-                dataType: 'json',
-                success: function (response) {
-                    if (response.success && response.data && response.data.length > 0) {
-                        users = response.data.filter(user => !user.isDelete);
-                        renderUsers();
-                        renderPagination();
-                    } else {
-                        $('#users').html('<p>No users found or failed to load users.</p>');
+            function fetchUsers() {
+                $.ajax({
+                    url: `/api/v1/users/?page=${currentPage}&limit=${usersPerPage}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success && response.data && response.data.users.length > 0) {
+                            users = response.data.users;
+                            var totalItems = response.data.total;
+                            // console.log(users);
+                            // console.log(totalItems);
+                            renderUsers();
+                            renderPagination(totalItems); 
+                        } else {
+                            $('#users').html('<p>No users found or failed to load users.</p>');
+                        }
+                    },
+
+                    error: function () {
+                        $('#users').html('<p>Error fetching users. Please make sure you are authorized.</p>');
                     }
-                },
-                error: function () {
-                    $('#users').html('<p>Error fetching users. Please make sure you are authorized.</p>');
-                }
-            });
-        }
-
-        function renderUsers() {
-            var startIndex = (currentPage - 1) * usersPerPage;
-            var endIndex = startIndex + usersPerPage;
-            var usersToShow = users.slice(startIndex, endIndex);
-
-            $('#users').empty();
-            usersToShow.forEach(function (user) {
-                var userImage = user.image && user.image !== 'null' ? user.image : 'https://via.placeholder.com/150';
-                var userHtml = `
+                });
+            }
+            function renderUsers() {
+                var startIndex = (currentPage - 1) * usersPerPage;
+                var endIndex = startIndex + usersPerPage;
+                var usersToShow = users;
+                $('#users').empty();
+                usersToShow.forEach(function (user) {
+                    var userImage = user.image && user.image !== 'null' ? user.image : 'https://via.placeholder.com/150';
+                    var userHtml = `
                     <div class="col-md-4 mb-3">
                         <div class="card h-100">
                             <img src="${userImage}" class="card-img-top mx-auto d-block" alt="${user.username}" style="width: 200px; height: 200px; object-fit: cover;">
@@ -72,33 +76,37 @@
                             </div>
                         </div>
                     </div>`;
-                $('#users').append(userHtml);
-            });
-        }
-
-        function renderPagination() {
-            var totalPages = Math.ceil(users.length / usersPerPage);
-            var paginationHtml = '<nav aria-label="Page navigation"><ul class="pagination">';
-            for (let i = 1; i <= totalPages; i++) {
-                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`;
+                    $('#users').append(userHtml);
+                });
             }
-            paginationHtml += '</ul></nav>';
-            $('#pagination').html(paginationHtml);
-        }
 
-        $(document).on('click', '.page-link', function (e) {
-            e.preventDefault();
-            currentPage = parseInt($(this).text());
-            renderUsers();
-            renderPagination();
+            function renderPagination(totalItems) {
+                var totalPages = Math.ceil(totalItems / usersPerPage);
+                $('#pagination').empty(); // Xóa phân trang cũ
+                var paginationHtml = '<nav><ul class="pagination">';
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`;
+                }
+                paginationHtml += '</ul></nav>';
+                $('#pagination').html(paginationHtml);
+            }
+
+
+            $(document).on('click', '.page-link', function (e) {
+                e.preventDefault();
+                var selectedPage = parseInt($(this).text());
+                if (!isNaN(selectedPage) && selectedPage !== currentPage) {
+                    currentPage = selectedPage;
+                    fetchUsers(); 
+                    renderUsers();
+                }
+            });
+            fetchUsers();
         });
 
-        fetchUsers();
-    });
-
-    function editUser(userId) {
-        window.location.href = '/edit-user/' + userId;
-    }
+        function editUser(userId) {
+            window.location.href = '/edit-user/' + userId;
+        }
     </script>
     <script>
         $('#users').on('click', '.deleteBtn', function () {
@@ -125,4 +133,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -6,12 +6,21 @@ var Validator = require('../validators/user');
 const { validationResult } = require('express-validator');
 const protect = require('../middleware/protect');
 const checkRole = require('../middleware/checkRole');
+// Ví dụ về router cho Node.js sử dụng Express và Mongoose
+router.get('/', protect, checkRole("admin"), async function (req, res, next) {
+  const page = parseInt(req.query.page);
+  const limit = parseInt(req.query.limit);
+  const skip = (page - 1) * limit;
 
-router.get('/', protect, checkRole("admin"),
-  async function (req, res, next) {
-    let users = await userModel.find({}).exec();
-    ResHelper.ResponseSend(res, true, 200, users)
-  });
+  try {
+      const users = await userModel.find({}).skip(skip).limit(limit).exec();
+      const total = await userModel.countDocuments({});
+
+      ResHelper.ResponseSend(res, true, 200, { users, total });
+  } catch (error) {
+      ResHelper.ResponseSend(res, false, 500, { message: "An error occurred" });
+  }
+});
 
 router.get('/:id', protect, async function (req, res, next) {
   try {
