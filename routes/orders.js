@@ -2,8 +2,10 @@ var express = require('express');
 var router = express.Router();
 var responseReturn = require('../helper/ResponseHandle');
 var orderModel = require('../schemas/order');
+const protect = require('../middleware/protect');
+const checkRole = require('../middleware/checkRole');
 
-router.get('/', async function (req, res, next) {
+router.get('/', protect, checkRole("user"), async function (req, res, next) {
     var queries = {};
     for (const [key, value] of Object.entries(req.query)) {
         if (!arrayExclude.includes(key)) {
@@ -26,7 +28,7 @@ router.get('/:id', async function (req, res, next) {
     }
 });
 
-router.get('/user/:userId', async function (req, res, next) {
+router.get('/user/:userId',protect, checkRole("user"), async function (req, res, next) {
     try {
         let orders = await orderModel.find({ user: req.params.userId })
             .populate({ path: 'product', select: '' })
@@ -56,7 +58,7 @@ router.post('/', async function (req, res, next) {
     }
 })
 
-router.put('/:id', async function (req, res, next) {
+router.put('/:id',protect, checkRole("admin"), async function (req, res, next) {
     try {
         let orders = await orderModel.findByIdAndUpdate(req.params.id, req.body,
             {
@@ -68,7 +70,7 @@ router.put('/:id', async function (req, res, next) {
     }
 })
 
-router.delete('/:id', async function (req, res, next) {
+router.delete('/:id',protect, checkRole("admin"), async function (req, res, next) {
     try {
         let orders = await orderModel.findByIdAndUpdate(req.params.id, {
             isDelete: true

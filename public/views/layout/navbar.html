@@ -10,32 +10,34 @@
                 <a class="nav-link font-weight-bold" href="/home">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="#">Products</a>
+                <a class="nav-link font-weight-bold" id="products" href="#">Products</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/order">Orders</a>
+                <a class="nav-link font-weight-bold" id="orders" href="/order">Orders</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/cart">Cart</a>
+                <a class="nav-link font-weight-bold" id="cart" href="/cart">Cart</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/users">Users</a>
+                <a class="nav-link font-weight-bold" id="users" href="/users">Users</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/login">Login</a>
+                <a class="nav-link font-weight-bold" id="loginButton" href="/login">Login</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link font-weight-bold" id="logoutButton" href="#">Logout</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/forgotpassword">Forgot Password</a>
+                <a class="nav-link" id="register" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="forgotpassword" href="/forgotpassword">Forgot Password</a>
             </li>
         </ul>
     </div>
 </nav>
-
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $('#logoutButton').click(function (event) {
@@ -56,6 +58,61 @@
                 console.error('Lỗi khi đăng xuất:', error);
             }
         });
+    });   
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Hàm để kiểm tra trạng thái đăng nhập và quyền của người dùng
+        function checkLoginStatus() {
+            $.ajax({
+                url: '/api/v1/auth/me',
+                type: 'GET',
+                xhrFields: {
+                    withCredentials: true
+                },
+                success: function (response) {
+                    if (response.success) {
+                        if (response.data.role.includes("ADMIN")) {
+                            $('#loginButton').hide();
+                            $('#forgotpassword').show();
+                            $('#logoutButton').show();
+                            $('#register').hide();
+                            $('#products').show();
+                            $('#users').show();
+                            $('#orders').hide();
+                            $('#cart').hide();
+                        } else if(response.data.role.includes("USER")) {
+                            $('#loginButton').hide();
+                            $('#forgotpassword').show();
+                            $('#logoutButton').show();
+                            $('#register').hide();
+                            $('#products').hide();
+                            $('#users').hide();
+                        }
+                    } else {
+                        $('#loginButton').show();
+                        $('#register').show();
+                        $('#forgotpassword').hide();
+                        $('#logoutButton').hide();
+                        $('#products').hide();
+                        $('#users').hide();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    $('#loginButton').show();
+                    $('#register').show();
+                    $('#forgotpassword').show();
+                    $('#logoutButton').hide();
+                    $('#products').hide();
+                    $('#users').hide();
+                }
+            });
+        }
+
+        // Gọi hàm kiểm tra trạng thái đăng nhập và quyền của người dùng khi trang web được tải
+        checkLoginStatus();
     });
+
 
 </script>

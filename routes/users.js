@@ -22,7 +22,7 @@ router.get('/', protect, checkRole("admin"), async function (req, res, next) {
   }
 });
 
-router.get('/:id', protect, async function (req, res, next) {
+router.get('/:id', protect, checkRole("admin"), async function (req, res, next) {
   try {
     let user = await userModel.findById(req.params.id).exec();
     // Ensure ResHelper.ResponseSend is the correct method
@@ -34,7 +34,7 @@ router.get('/:id', protect, async function (req, res, next) {
 });
 
 
-router.post('/', Validator.UserValidate(), async function (req, res, next) {
+router.post('/',protect, checkRole("admin"), Validator.UserValidate(), async function (req, res, next) {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -60,7 +60,7 @@ router.post('/', Validator.UserValidate(), async function (req, res, next) {
 });
 
 
-router.put('/:id', async function (req, res, next) {
+router.put('/:id',protect, checkRole("admin"), async function (req, res, next) {
   try {
     let user = await userModel.findById
       (req.params.id).exec()
@@ -77,8 +77,7 @@ router.put('/:id', async function (req, res, next) {
   }
 });
 
-
-router.delete('/:id', async function (req, res, next) {
+router.delete('/:id',protect, checkRole("admin"), async function (req, res, next) {
   try {
     let user = await userModel.findByIdAndUpdate(
       req.params.id,

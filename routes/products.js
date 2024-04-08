@@ -4,7 +4,7 @@ var responseReturn = require('../helper/ResponseHandle');
 var productModel = require('../schemas/product');
 const protect = require('../middleware/protect');
 const checkRole = require('../middleware/checkRole');
-router.get('/', protect, checkRole("admin"), async function (req, res, next) {
+router.get('/', async function (req, res, next) {
     var product = await productModel.find({}).exec();
     responseReturn.ResponseSend(res, true, 200, product)
 });
@@ -18,7 +18,7 @@ router.get('/:id', async function (req, res, next) {
     }
 });
 
-router.post('/', async function (req, res, next) {
+router.post('/', protect, checkRole("admin"), async function (req, res, next) {
     try {
         var newProduct = new productModel({
             name: req.body.name,
@@ -35,7 +35,7 @@ router.post('/', async function (req, res, next) {
     }
 })
 
-router.put('/:id', async function (req, res, next) {
+router.put('/:id', protect, checkRole("admin"), async function (req, res, next) {
     try {
         let product = await productModel.findByIdAndUpdate(req.params.id, req.body,
             {
@@ -47,7 +47,7 @@ router.put('/:id', async function (req, res, next) {
     }
 })
 
-router.delete('/:id', async function (req, res, next) {
+router.delete('/:id', protect, checkRole("admin"), async function (req, res, next) {
     try {
         let product = await productModel.findByIdAndUpdate(req.params.id, {
             isDelete: true
