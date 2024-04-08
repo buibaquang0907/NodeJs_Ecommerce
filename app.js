@@ -53,6 +53,18 @@ app.get('/changepassword/:i', function(req, res) {
 app.get('/forgotpassword', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'forgotpassword.html'));
 });
+
+app.get('/productadmin', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'productadmin.html'));
+});
+app.get('/createproductadmin', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'create_productadmin.html'));
+});
+app.get('/editproductadmin/:i', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'edit_productadmin.html'));
+});
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

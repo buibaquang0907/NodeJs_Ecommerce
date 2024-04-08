@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProductAdmin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="card" style="width: 30rem;">
+            <div class="card-body">
+                <h2 class="card-title">Create Product</h2>
+                <form id="createProduct">
+                    <!-- Form fields for editing a user -->
+                    <input type="hidden" id="productId">
+                    <div class="form-group">
+                        <label for="name">Name Product</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="descripsion">Descripsion Product</label>
+                        <input type="text" class="form-control" id="descripsion" name="descripsion">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price Product</label>
+                        <input type="text" class="form-control" id="price" name="price">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status Product</label>
+                        <input type="text" class="form-control" id="status" name="status">
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image Product</label>
+                        <input type="text" class="form-control" id="image" name="image">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select class="form-control" id="category" name="category">
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    <a href="/productadmin" class="btn btn-danger">Back to Product List</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script>
+        $(document).ready(function () {
+            $('#createProduct').submit(function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                var formData = $(this).serialize(); // Serialize the form data
+
+                $.ajax({
+                    url: '/api/v1/products',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData, // Send the serialized form data
+                    success: function () {
+                        alert('Product created successfully.');
+                        window.location.href = '/productadmin'; // Redirect back to the product listing page
+                    },
+                    error: function (request) {
+                        var response = JSON.parse(request.responseText);
+                        if (response.data && response.data.code === 11000) {
+                            var errorField = Object.keys(response.data.keyPattern)[0];
+                            var fieldValue = response.data.keyValue[errorField];
+                            var errorMessage = `The ${errorField} "${fieldValue}" is already in use.`;
+                            $('#' + errorField + 'Error').text(errorMessage);
+                        } else {
+                            alert('An unexpected error occurred.');
+                        }
+                    }
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            // Fetch categories from the server
+            $.ajax({
+                url: '/api/v1/categorys/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // Populate the category select box
+                    console.log(data);
+                    var categorySelect = $('#category');
+
+                    data.data.forEach(function (category) {
+                        categorySelect.append($('<option>', {
+                            value: category.id,
+                            text: category.name
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching categories:', error);
+                }
+            });
+        });
+
+        $(function () {
+            $("#navbar-placeholder").load("../views/layout/navbar.html");
+            $("#footer-placeholder").load("../views/layout/footer.html");
+        });
+    </script>
+</body>
+
+</html>

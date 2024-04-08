@@ -4,14 +4,16 @@ var responseReturn = require('../helper/ResponseHandle');
 var productModel = require('../schemas/product');
 const protect = require('../middleware/protect');
 const checkRole = require('../middleware/checkRole');
-router.get('/', async function (req, res, next) {
-    var product = await productModel.find({}).exec();
+router.get('/',async function (req, res, next) {
+    var product = await productModel.find({isDelete:false}).exec();
+    console.log(product);
     responseReturn.ResponseSend(res, true, 200, product)
 });
 
 router.get('/:id', async function (req, res, next) {
     try {
-        let product = await productModel.find({ _id: req.params.id });
+        let product = await productModel.findById({ _id: req.params.id });
+        console.log(product);
         responseReturn.ResponseSend(res, true, 200, product)
     } catch (error) {
         responseReturn.ResponseSend(res, false, 404, error)
