@@ -48,6 +48,8 @@ userSchema.methods.getJWT = function () {
 userSchema.methods.genTokenResetPassword = function () {
     this.ResetPasswordToken = crypto.randomBytes(30).toString('hex');
     this.ResetPasswordExp = Date.now() + 60 * 1000 * 10;
+    //this.ResetPasswordExp = Date.now() + 10000;;
+    console.log("token reset gen" + this.ResetPasswordToken);
     return this.ResetPasswordToken;
 }
 module.exports = new mongoose.model('user', userSchema)

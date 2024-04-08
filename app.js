@@ -47,7 +47,12 @@ app.get('/order', function(req, res) {
 app.get('/checkout', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'checkout.html'));
 });
-
+app.get('/changepassword/:i', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'changepassword.html'));
+});
+app.get('/forgotpassword', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'forgotpassword.html'));
+});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

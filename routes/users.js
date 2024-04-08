@@ -13,9 +13,9 @@ router.get('/', protect, checkRole("admin"), async function (req, res, next) {
   const skip = (page - 1) * limit;
 
   try {
-      const users = await userModel.find({}).skip(skip).limit(limit).exec();
-      const total = await userModel.countDocuments({});
-
+      const users = await userModel.find({isDelete:false}).skip(skip).limit(limit).exec();
+      const total = await userModel.countDocuments({isDelete:false});
+      console.log(users);
       ResHelper.ResponseSend(res, true, 200, { users, total });
   } catch (error) {
       ResHelper.ResponseSend(res, false, 500, { message: "An error occurred" });
@@ -92,68 +92,4 @@ router.delete('/:id', async function (req, res, next) {
   }
 });
 
-router.post('/forgotpassword', async function (req, res, next) {
-  try {
-    const { email } = req.body;
-    const user = await userModel.findOne({ email });
-
-    if (!user) {
-      return ResHelper.ResponseSend(res, false, 404, "User not found");
-    }
-
-    const token = user.genTokenResetPassword();
-    await user.save();
-
-    // Send reset password link to the user's email
-    const resetLink = `${req.protocol}://${req.get('host')}/resetpassword/${token}`;
-    await sendMail(user.email, resetLink);
-
-    ResHelper.ResponseSend(res, true, 200, "Kiểm tra email của bạn để reset");
-  } catch (error) {
-    ResHelper.ResponseSend(res, false, 500, "Có lỗi xảy ra");
-  }
-});
-
-router.post('/resetpassword', async function (req, res, next) {
-  try {
-    const { token, newPassword } = req.body;
-    const user = await userModel.findOne({ ResetPasswordToken: token });
-
-    if (!user || user.ResetPasswordExp < Date.now()) {
-      return ResHelper.ResponseSend(res, false, 400, "Có lỗi xảy ra");
-    }
-
-    // Reset password
-    user.password = newPassword;
-    user.ResetPasswordToken = undefined;
-    user.ResetPasswordExp = undefined;
-    await user.save();
-
-    ResHelper.ResponseSend(res, true, 200, "Thay đổi mật khẩu thành công");
-  } catch (error) {
-    ResHelper.ResponseSend(res, false, 500, "Có lỗi xảy ra");
-  }
-});
-
-router.put('/changepassword', protect, async function (req, res, next) {
-  try {
-    const { oldPassword, newPassword } = req.body;
-    const user = req.user;
-
-    // Check if old password matches
-    const isMatch = await user.comparePassword(oldPassword);
-
-    if (!isMatch) {
-      return ResHelper.ResponseSend(res, false, 400, "Old password is incorrect");
-    }
-
-    // Update password
-    user.password = newPassword;
-    await user.save();
-
-    ResHelper.ResponseSend(res, true, 200, "Thay đổi mật khẩu thành công");
-  } catch (error) {
-    ResHelper.ResponseSend(res, false, 500, "Có lỗi xảy ra");
-  }
-});
 module.exports = router;

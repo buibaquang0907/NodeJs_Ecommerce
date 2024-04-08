@@ -36,7 +36,7 @@ router.post('/ForgotPassword', async function (req, res, next) {
     let token = user.genTokenResetPassword(); 
     await user.save();
     
-    let url = `http://127.0.0.1:3000/api/v1/auth/ResetPassword/${token}`;
+    let url = `http://127.0.0.1:3000/changepassword/${token}`;
     await sendmail(user.email, url); 
     
     ResHelper.ResponseSend(res, true, 200, "Gửi mail thành công");
@@ -45,24 +45,6 @@ router.post('/ForgotPassword', async function (req, res, next) {
     ResHelper.ResponseSend(res, false, 500, "Có lỗi xảy ra");
   }
 });
-// router.post('/ForgotPassword', async function (req, res, next) {
-//   let user = await userModel.findOne({
-//     email: req.body.email
-//   })
-//   if (!user) {
-//     ResHelper.ResponseSend(res, false, 404, "email khong ton tai")
-//   }
-//   let token = user.genTokenResetPassword();
-//   await user.save();
-//   let url = `http://127.0.0.1:3000/api/v1/auth/ResetPassword/${token}`;
-//   try {
-//     await sendmail(user.email,url);
-//     ResHelper.ResponseSend(res, true, 200, "gui mail thanh cong")
-//   } catch (error) {
-//     ResHelper.ResponseSend(res, false, 404, error)
-//   }
-
-// });
 
 function validatePassword(password) {
   const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -71,6 +53,7 @@ function validatePassword(password) {
 
 router.post('/ResetPassword/:token', async function (req, res, next) {
   try {
+    console.log(req.params.token);
     let user = await userModel.findOne({
       ResetPasswordToken: req.params.token
     });
