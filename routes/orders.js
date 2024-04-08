@@ -5,7 +5,7 @@ var orderModel = require('../schemas/order');
 const protect = require('../middleware/protect');
 const checkRole = require('../middleware/checkRole');
 
-router.get('/', protect, checkRole("user"), async function (req, res, next) {
+router.get('/', async function (req, res, next) {
     var queries = {};
     for (const [key, value] of Object.entries(req.query)) {
         if (!arrayExclude.includes(key)) {
