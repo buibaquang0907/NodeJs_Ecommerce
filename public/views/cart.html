@@ -7,89 +7,7 @@
     <title>Cart</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <style>
-        body {
-            background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-img-top {
-            max-height: 250px;
-            object-fit: cover;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-        }
-
-        .card-body {
-            padding: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .card-text {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-        }
-
-        .quantity-controls input {
-            width: 50px;
-            text-align: center;
-            margin: 0 10px;
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-        }
-
-        .btn {
-            cursor: pointer;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: #fff;
-            padding: 6px 12px;
-            font-size: 14px;
-            border-radius: 3px;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: #fff;
-            padding: 6px 12px;
-            font-size: 14px;
-            border-radius: 3px;
-        }
-
-        #totalPrice {
-            font-weight: bold;
-            font-size: 20px;
-            margin-top: 20px;
-            color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="../stylesheets/cart.css">
 </head>
 
 <body>
@@ -101,24 +19,37 @@
         <div id="cartItems" class="row"></div>
         <h4 class="mt-4">Total: $<span id="totalPrice">0</span></h4>
         <form id="checkoutForm">
-            <div class="form-group">
-                <label for="shippingAddress">Shipping Address</label>
-                <input type="text" class="form-control" id="shippingAddress" name="shippingAdress"
-                    placeholder="Enter shipping address" required>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="shippingAddress">Shipping Address</label>
+                    <input type="text" class="form-control form-control-lg" id="shippingAddress" name="shippingAdress"
+                        placeholder="Enter shipping address" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="dateOrder">Order Date</label>
+                    <input type="text" class="form-control form-control-lg" id="dateOrder" name="dateOrder" readonly>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="dateOrder">Order Date</label>
-                <input type="text" class="form-control" id="dateOrder" name="dateOrder" readonly>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="paymentOption">Payment Option</label>
+                    <select class="form-control form-control-lg" id="paymentOption" name="paymentOption" required>
+                        <option value="COD" selected>Cash on Delivery</option>
+                        <option value="StorePickup">Store Pickup</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="dateOrder">Expected Receipt Date</label>
+                    <input type="text" class="form-control form-control-lg" value="1 - 2 days with COD" readonly>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="paymentOption">Payment Option</label>
-                <select class="form-control" id="paymentOption" name="paymentOption" required>
-                    <option value="COD" selected>Cash on Delivery</option>
-                    <option value="StorePickup">Store Pickup</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group col-md-12 text-center">
+                    <button type="submit" class="btn btn-success btn-lg">Place Order</button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Place Order</button>
         </form>
+
     </div>
 
     <div id="footer-placeholder"></div>
@@ -133,29 +64,27 @@
             let productsHtml = '';
 
             totalPrice = 0;
-            productIds = []; // Reset mảng productIds
+            productIds = [];
 
             if (cart.length > 0) {
                 cart.forEach(function (item) {
                     const itemTotal = item.price * item.quantity;
                     totalPrice += itemTotal;
-                    productIds.push(item.id); // Thêm ID của sản phẩm vào mảng productIds
+                    productIds.push(item.id);
 
                     productsHtml += `<div class="col-md-4 mb-3">
                         <div class="card">
                             ${item.image ? `<img src="${item.image}" style="width: 200px; height: 200px; object-fit: cover;" class="card-img-top mx-auto d-block">` : ''}
-                            <div class="card-body">
-                                <h5 class="card-title">${item.name}</h5>
-                                <p class="card-text">Description: ${item.description}</p>
-                                <p class="card-text">Price: $${item.price}</p>
-                                <div class="quantity-controls">
-                                    <button class="btn btn-secondary decrease" data-id="${item.id}">-</button>
-                                    <input type="text" value="${item.quantity}" readonly>
-                                    <button class="btn btn-secondary increase" data-id="${item.id}">+</button>
-                                </div>
-                                <p class="card-text">Total: $${itemTotal.toFixed(2)}</p>
-                                <button class="btn btn-danger removeFromCart" data-id="${item.id}">Remove from Cart</button>
+                            <div class="card-body d-flex flex-column justify-content-center">
+                            <h5 class="card-title text-center">${item.name}</h5>
+                            <p class="card-text font-weight-bold text-center">Price: $${item.price}</p>
+                            <div class="quantity-controls mb-2 d-flex justify-content-center">
+                                <button class="btn btn-secondary decrease" data-id="${item.id}">-</button>
+                                <input type="text" value="${item.quantity}" readonly>
+                                <button class="btn btn-secondary increase" data-id="${item.id}">+</button>
                             </div>
+                            <button class="btn btn-danger removeFromCart" data-id="${item.id}">Remove</button>
+                        </div>
                         </div>
                     </div>`;
                 });

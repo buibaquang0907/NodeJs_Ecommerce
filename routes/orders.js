@@ -2,8 +2,6 @@ var express = require('express');
 var router = express.Router();
 var responseReturn = require('../helper/ResponseHandle');
 var orderModel = require('../schemas/order');
-var productModel = require('../schemas/product');
-var userModel = require('../schemas/user')
 
 router.get('/', async function (req, res, next) {
     var queries = {};
@@ -18,6 +16,7 @@ router.get('/', async function (req, res, next) {
         .exec();
     responseReturn.ResponseSend(res, true, 200, orders)
 });
+
 router.get('/:id', async function (req, res, next) {
     try {
         let orders = await orderModel.findByIdAndUpdate({ _id: req.params.id });
@@ -27,9 +26,12 @@ router.get('/:id', async function (req, res, next) {
     }
 });
 
-router.get('/:user', async function (req, res, next) {
+router.get('/user/:userId', async function (req, res, next) {
     try {
-        let orders = await orderModel.find({ user: req.params.user });
+        let orders = await orderModel.find({ user: req.params.userId })
+            .populate({ path: 'product', select: '' })
+            .populate({ path: 'user', select: '' })
+            .exec();;
         responseReturn.ResponseSend(res, true, 200, orders)
     } catch (error) {
         responseReturn.ResponseSend(res, false, 404, error)

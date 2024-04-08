@@ -1,9 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var responseReturn = require('../helper/ResponseHandle');
-const product = require('../schemas/product');
 var productModel = require('../schemas/product');
-var categoryModel = require('../schemas/category');
 const protect = require('../middleware/protect');
 const checkRole = require('../middleware/checkRole');
 router.get('/', protect, checkRole("admin"), async function (req, res, next) {
