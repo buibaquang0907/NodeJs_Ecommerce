@@ -44,7 +44,7 @@
                             // console.log(users);
                             // console.log(totalItems);
                             renderUsers();
-                            renderPagination(totalItems); 
+                            renderPagination(totalItems);
                         } else {
                             $('#users').html('<p>No users found or failed to load users.</p>');
                         }
@@ -97,7 +97,7 @@
                 var selectedPage = parseInt($(this).text());
                 if (!isNaN(selectedPage) && selectedPage !== currentPage) {
                     currentPage = selectedPage;
-                    fetchUsers(); 
+                    fetchUsers();
                     renderUsers();
                 }
             });

@@ -1,42 +1,40 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/home">ProductStore</a>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="/home"><i class="fas fa-store"></i> ProductStore</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <a class="navbar-brand font-weight-bold" href="/home">ProductStore</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link font-weight-bold" href="/home">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link font-weight-bold" href="/productadmin">Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link font-weight-bold" href="/order">Orders</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link font-weight-bold" href="/cart">Cart</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link font-weight-bold" href="/users">Users</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link font-weight-bold" href="/login">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link font-weight-bold" id="logoutButton" href="#">Logout</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/forgotpassword">Forgot Password</a>
-                </li>
-            </ul>
-        </div>
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/home"><i class="fas fa-home"></i> Home <span
+                        class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/productadmin"><i class="fas fa-boxes"></i> Products</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/order"><i class="fas fa-shopping-cart"></i> Orders</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/cart"><i class="fas fa-shopping-basket"></i> Cart</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/users"><i class="fas fa-users"></i> Users</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="logoutButton" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/forgotpassword"><i class="fas fa-question-circle"></i> Forgot Password</a>
+            </li>
+        </ul>
+    </div>
 </nav>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -52,7 +50,7 @@
             },
             success: function (response) {
                 alert(response);
-
+                localStorage.setItem('cart', JSON.stringify([]));
                 window.location.href = '/login';
             },
             error: function (xhr, status, error) {
@@ -63,47 +61,78 @@
 
 </script>
 <script>
-    $(document).ready(function() {
-    $.ajax({
-        url: '/api/v1/auth/me', 
-        type: 'GET',
-        success: function(response) {
-            const roles = response.data.role;
-            if (roles.includes('USER')) {
-                $('a[href="/users"]').parent().hide();
-                $('a[href="/productadmin"]').parent().hide();
-                // $('a[href="/categories"]').parent().hide();
-            } else if (roles.includes('ADMIN')) {
-                $('a[href="/order"]').parent().hide();
-                $('a[href="/cart"]').parent().hide();
-                // $('a[href="/home"]').parent().hide(); 
+    $(document).ready(function () {
+        $.ajax({
+            url: '/api/v1/auth/me',
+            type: 'GET',
+            success: function (response) {
+                const roles = response.data.role;
+                if (roles.includes('USER')) {
+                    $('a[href="/users"]').parent().hide();
+                    $('a[href="/productadmin"]').parent().hide();
+                    // $('a[href="/categories"]').parent().hide();
+                } else if (roles.includes('ADMIN')) {
+                    $('a[href="/order"]').parent().hide();
+                    $('a[href="/cart"]').parent().hide();
+                    // $('a[href="/home"]').parent().hide(); 
+                }
+                $('a[href="/login"]').parent().hide();
+                $('a[href="#logoutButton"]').parent().show();
+            },
+            error: function (error) {
+                console.error('Error fetching user data:', error);
+                $('a[href="/login"]').parent().show();
+                $('a[href="#logoutButton"]').parent().hide();
             }
-            $('a[href="/login"]').parent().hide();
-            $('a[href="#logoutButton"]').parent().show();
-        },
-        error: function(error) {
-            console.error('Error fetching user data:', error);
-            $('a[href="/login"]').parent().show();
-            $('a[href="#logoutButton"]').parent().hide();
-        }
+        });
     });
-});
 </script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Lấy pathname hiện tại từ URL
         var pathname = window.location.pathname;
-    
-        // Lặp qua mỗi mục trong navbar
-        $('.navbar-nav .nav-item a').each(function() {
+
+        $('.navbar-nav .nav-item a').each(function () {
             var href = $(this).attr('href');
-            
-            if(href === pathname) {
+
+            if (href === pathname) {
                 $(this).parent().addClass('active');
             } else {
                 $(this).parent().removeClass('active');
             }
         });
     });
-    </script>
-    
+</script>
+
+<style>
+    .navbar {
+        background-color: #007bff;
+    }
+
+    .navbar a.navbar-brand,
+    .navbar a.nav-link {
+        color: #fff !important;
+    }
+
+    .navbar a.nav-link {
+        margin-right: 15px;
+    }
+
+    .navbar a.nav-link:hover {
+        background-color: #0056b3 !important;
+        border-radius: 5px;
+    }
+
+    .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+
+    .nav-item.active a {
+        background-color: #004f9e !important;
+        border-radius: 5px;
+    }
+</style>

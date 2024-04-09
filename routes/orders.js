@@ -28,17 +28,25 @@ router.get('/:id', async function (req, res, next) {
     }
 });
 
-router.get('/user/:userId',protect, checkRole("user"), async function (req, res, next) {
+router.get('/user/:userId', protect, checkRole("user"), async function (req, res, next) {
+    const { page = 1, limit = 4 } = req.query;
+    
     try {
+        const totalOrders = await orderModel.countDocuments({ user: req.params.userId });
+
         let orders = await orderModel.find({ user: req.params.userId })
             .populate({ path: 'product', select: '' })
             .populate({ path: 'user', select: '' })
-            .exec();;
-        responseReturn.ResponseSend(res, true, 200, orders)
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+
+        responseReturn.ResponseSend(res, true, 200, { orders, totalPages: Math.ceil(totalOrders / limit) });
     } catch (error) {
         responseReturn.ResponseSend(res, false, 404, error)
     }
 });
+
 
 router.post('/', async function (req, res, next) {
     try {
@@ -58,7 +66,7 @@ router.post('/', async function (req, res, next) {
     }
 })
 
-router.put('/:id',protect, checkRole("admin"), async function (req, res, next) {
+router.put('/:id', protect, checkRole("admin"), async function (req, res, next) {
     try {
         let orders = await orderModel.findByIdAndUpdate(req.params.id, req.body,
             {
@@ -70,7 +78,7 @@ router.put('/:id',protect, checkRole("admin"), async function (req, res, next) {
     }
 })
 
-router.delete('/:id',protect, checkRole("admin"), async function (req, res, next) {
+router.delete('/:id', protect, checkRole("admin"), async function (req, res, next) {
     try {
         let orders = await orderModel.findByIdAndUpdate(req.params.id, {
             isDelete: true
