@@ -1,41 +1,42 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="/home">ProductStore</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <a class="navbar-brand font-weight-bold" href="/home">ProductStore</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link font-weight-bold" href="/home">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="#">Products</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/order">Orders</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/cart">Cart</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/users">Users</a>
-            </li>
-        </ul>
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link font-weight-bold" href="/login">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link font-weight-bold" id="logoutButton" href="#">Logout</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/forgotpassword">Forgot Password</a>
-            </li>
-        </ul>
-    </div>
+        <a class="navbar-brand font-weight-bold" href="/home">ProductStore</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link font-weight-bold" href="/home">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" href="/productadmin">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" href="/order">Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" href="/cart">Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" href="/users">Users</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link font-weight-bold" id="logoutButton" href="#">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/forgotpassword">Forgot Password</a>
+                </li>
+            </ul>
+        </div>
 </nav>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -61,3 +62,48 @@
     });
 
 </script>
+<script>
+    $(document).ready(function() {
+    $.ajax({
+        url: '/api/v1/auth/me', 
+        type: 'GET',
+        success: function(response) {
+            const roles = response.data.role;
+            if (roles.includes('USER')) {
+                $('a[href="/users"]').parent().hide();
+                $('a[href="/productadmin"]').parent().hide();
+                // $('a[href="/categories"]').parent().hide();
+            } else if (roles.includes('ADMIN')) {
+                $('a[href="/order"]').parent().hide();
+                $('a[href="/cart"]').parent().hide();
+                // $('a[href="/home"]').parent().hide(); 
+            }
+            $('a[href="/login"]').parent().hide();
+            $('a[href="#logoutButton"]').parent().show();
+        },
+        error: function(error) {
+            console.error('Error fetching user data:', error);
+            $('a[href="/login"]').parent().show();
+            $('a[href="#logoutButton"]').parent().hide();
+        }
+    });
+});
+</script>
+<script>
+    $(document).ready(function() {
+        // Lấy pathname hiện tại từ URL
+        var pathname = window.location.pathname;
+    
+        // Lặp qua mỗi mục trong navbar
+        $('.navbar-nav .nav-item a').each(function() {
+            var href = $(this).attr('href');
+            
+            if(href === pathname) {
+                $(this).parent().addClass('active');
+            } else {
+                $(this).parent().removeClass('active');
+            }
+        });
+    });
+    </script>
+    

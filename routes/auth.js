@@ -18,7 +18,7 @@ function validateEmail(email) {
   return emailRegex.test(email);
 }
 
-router.post('/ForgotPassword', async function (req, res, next) {
+router.post('/ForgotPassword',protect, async function (req, res, next) {
   if (!validateEmail(req.body.email)) {
     ResHelper.ResponseSend(res, false, 400, "Email không đúng định dạng");
     return;
@@ -51,7 +51,7 @@ function validatePassword(password) {
   return strongPasswordRegex.test(password);
 }
 
-router.post('/ResetPassword/:token', async function (req, res, next) {
+router.post('/ResetPassword/:token', protect, async function (req, res, next) {
   try {
     console.log(req.params.token);
     let user = await userModel.findOne({
@@ -81,7 +81,7 @@ router.post('/ResetPassword/:token', async function (req, res, next) {
   }
 });
 
-router.post('/logout', async function (req, res, next) {
+router.post('/logout',protect, async function (req, res, next) {
   res.status(200).cookie('token', "null", {
     expires: new Date(Date.now + 1000),
     httpOnly: true
