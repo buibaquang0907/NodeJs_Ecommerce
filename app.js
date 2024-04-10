@@ -53,7 +53,6 @@ app.get('/changepassword/:i', function(req, res) {
 app.get('/forgotpassword', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'forgotpassword.html'));
 });
-
 app.get('/productadmin', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'productadmin.html'));
 });
