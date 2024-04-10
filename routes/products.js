@@ -5,10 +5,20 @@ var productModel = require('../schemas/product');
 const protect = require('../middleware/protect');
 const checkRole = require('../middleware/checkRole');
 
-router.get('/',async function (req, res, next) {
-    var product = await productModel.find({isDelete:false}).exec();
-    console.log(product);
-    responseReturn.ResponseSend(res, true, 200, product)
+router.get('/', async function(req, res, next) {
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const skip = (page - 1) * limit;
+
+    try {
+        const products = await productModel.find({isDelete: false}).skip(skip).limit(limit).exec();
+        const total = await productModel.countDocuments({isDelete: false});
+        const totalPages = Math.ceil(total / limit);
+
+        res.status(200).json({ success: true, data: products, total, totalPages, page, limit });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "An error occurred", error: error.message });
+    }
 });
 
 router.get('/:id', async function (req, res, next) {
