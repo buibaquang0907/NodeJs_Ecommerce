@@ -3,6 +3,6 @@ module.exports = {
     EXP_JWT: '1d',
     Host: "smtp.ethereal.email",
     Port: 587,
-    Username: "hank.cole20@ethereal.email",
-    Password: "DJ5NwKyeZJWwBwx1QA"
+    Username: "ashly84@ethereal.email",
+    Password: "Y8ThSVjKeZF18gEUzj"
 }

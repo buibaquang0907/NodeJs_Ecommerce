@@ -15,11 +15,11 @@ const transporter = nodemailer.createTransport({
 module.exports = async function (desEmail,message) {
     // send mail with defined transport object
     const info = await transporter.sendMail({
-        from: '"Maddison Foo Koch 👻" <katheryn.rath50@ethereal.email>', // sender address
+        from: '"Kaaka in de hood 👻" <thankyou@gmail.com>', // sender address
         to: desEmail, // list of receivers
-        subject: "Hello ✔", // Subject line
+        subject: "Change Your Password ✔", // Subject line
         text: message, // plain text body
-        html:'<a href='+message+'>click vo day de doi passs</a>'
+        html:'<a href='+message+'>Thay đổi mật khẩu của bạn tại đây!</a>'
     });
 
     console.log("Message sent: %s", info.messageId);
