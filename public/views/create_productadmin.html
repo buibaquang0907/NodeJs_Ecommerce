@@ -84,28 +84,26 @@
             });
         });
 
-        $(document).ready(function () {
-            // Fetch categories from the server
-            $.ajax({
-                url: '/api/v1/categorys/',
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    // Populate the category select box
-                    console.log(data);
+        $.ajax({
+            url: '/api/v1/categorys', // Make sure the endpoint is correct.
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response.success && response.data.categories && response.data.categories.length > 0) {
                     var categorySelect = $('#category');
-
-                    data.data.forEach(function (category) {
+                    response.data.categories.forEach(function (category) {
                         categorySelect.append($('<option>', {
-                            value: category.id,
+                            value: category._id,
                             text: category.name
                         }));
                     });
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error fetching categories:', error);
+                } else {
+                    console.error('No categories found or failed to load categories.');
                 }
-            });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching categories:', error);
+            }
         });
 
         $(function () {

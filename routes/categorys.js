@@ -5,13 +5,22 @@ const category = require('../schemas/category');
 var categoryModel = require('../schemas/category');
 
 router.get('/', async function (req, res, next) {
-    var category = await categoryModel.find({}).exec();
-    responseReturn.ResponseSend(res, true, 200, category)
+    let limit = parseInt(req.query.limit) || 10; // Sets default page size to 10
+    let page = parseInt(req.query.page) || 1;    // Sets default to the first page
+    let skip = (page - 1) * limit;
+
+    try {
+        var total = await categoryModel.countDocuments();  // Count the total documents
+        var categories = await categoryModel.find({isDelete:false}).skip(skip).limit(limit).exec();
+        responseReturn.ResponseSend(res, true, 200, { total: total, categories: categories });
+    } catch (error) {
+        responseReturn.ResponseSend(res, false, 404, error);
+    }
 });
 
 router.get('/:id', async function (req, res, next) {
     try {
-        let category = await categoryModel.find({ _id: req.params.id });
+        let category = await categoryModel.findById({ _id: req.params.id });
         responseReturn.ResponseSend(res, true, 200, category)
     } catch (error) {
         responseReturn.ResponseSend(res, false, 404, error)

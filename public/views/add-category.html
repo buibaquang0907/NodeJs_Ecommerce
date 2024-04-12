@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="card" style="width: 30rem;">
+            <div class="card-body">
+                <h2 class="card-title">Add Category</h2>
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label for="name">Category Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image URL</label>
+                        <input type="text" class="form-control" id="image" name="image">
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Category</button>
+                    <a href="/categories" class="btn btn-danger">Back to Categories</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script>
+        $(document).ready(function () {
+            $('#addCategoryForm').submit(function (e) {
+                e.preventDefault();
+                var categoryData = {
+                    name: $('#name').val(),
+                    image: $('#image').val(),
+                };
+
+                $.ajax({
+                    url: '/api/v1/categorys',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(categoryData),
+                    success: function () {
+                        alert('Category added successfully.');
+                        window.location.href = '/categories'; // Redirect back to the listing page
+                    },
+                    error: function () {
+                        alert('Error adding category.');
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(function () {
+            $("#navbar-placeholder").load("../views/layout/navbar.html");
+            $("#footer-placeholder").load("../views/layout/footer.html");
+        });
+    </script>
+</body>
+</html>

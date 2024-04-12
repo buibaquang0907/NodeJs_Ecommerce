@@ -37,7 +37,13 @@
                                 '<h5 class="card-title mb-0">' + product.name + '</h5>' +
                                 '<p class="card-text mb-0">Price: $' + product.price + '</p>' +
                                 '</div>' +
-                                '<p class="card-text mt-2">' + (product.descripsion || 'No description available') + '</p>' +
+                                '<p class="card-text mt-2">' +
+                                (product.descripsion
+                                    ? product.descripsion.split(' ').slice(0, 20).join(' ') +
+                                    (product.descripsion.split(' ').length > 20 ? '...' : '')
+                                    : 'No description available') +
+                                '</p>'
+                                +
                                 '<button class="btn btn-primary addToCart" data-id="' + product._id + '" data-name="' + product.name + '" data-description="' + product.description + '" data-price="' + product.price + '" data-image="' + product.image + '">Add to Cart</button>' +
                                 '</div>' +
                                 '</div>' +

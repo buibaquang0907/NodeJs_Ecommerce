@@ -62,7 +62,15 @@ app.get('/createproductadmin', function(req, res) {
 app.get('/editproductadmin/:i', function(req, res) {
   res.sendFile(path.join(__dirname, 'public/views', 'edit_productadmin.html'));
 });
-
+app.get('/categories', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'categories.html'));
+});
+app.get('/edit-category/:i', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'edit-category.html'));
+});
+app.get('/add-category/', function(req, res) {
+  res.sendFile(path.join(__dirname, 'public/views', 'add-category.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

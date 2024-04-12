@@ -65,7 +65,7 @@
                     type: 'DELETE',
                     success: function (result) {
                         alert('Product deleted successfully');
-                        fetchProducts(); // Gọi lại hàm fetchProducts() để cập nhật danh sách sau khi xóa
+                        location.reload();
                     },
                     error: function (request, status, error) {
                         alert('Error deleting product: ' + error);
@@ -117,7 +117,7 @@
                         <img src="${product.image}" class="card-img-top mx-auto d-block" style="width: 200px; height: 200px; object-fit: cover;" alt="${product.name}">
                         <div class="card-body">
                             <h5 class="card-title">${product.name}</h5>
-                            <p class="card-text">${product.description}</p>
+                            <p class="card-text">${product.descripsion.substring(0, 100) + (product.descripsion.length > 200 ? '...' : '')}</p>
                             <p class="card-text">$${product.price}</p>
                             <a href="/editproductadmin/${product._id}" class="btn btn-primary">Edit</a>
                             <button class="btn btn-danger deleteBtn" data-id="${product._id}">Delete</button>

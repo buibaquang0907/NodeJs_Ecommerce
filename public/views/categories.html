@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/3.0.1/js.cookie.min.js"></script>
+</head>
+
+<body>
+    <div id="navbar-placeholder"></div>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Categories</h2>
+                <button class="btn btn-success" onclick="addCategory()">Add New Category</button>
+            </div>
+            <div id="categories" class="row card-body"></div>
+            <div id="pagination" class="card-footer d-flex justify-content-center"></div>
+        </div>
+    </div>
+    <div id="footer-placeholder"></div>
+    <script>
+        $(document).ready(function () {
+            var categoriesPerPage = 3;
+            var currentPage = 1;
+            var categories = [];
+
+            function fetchCategories() {
+                $.ajax({
+                    url: `/api/v1/categorys/?page=${currentPage}&limit=${categoriesPerPage}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success && response.data.categories.length > 0) {
+                            categories = response.data.categories;
+                            renderCategories();
+                            renderPagination(response.data.total);
+                        } else {
+                            $('#categories').html('<p>No categories found or failed to load categories.</p>');
+                        }
+                    },
+                    error: function () {
+                        $('#categories').html('<p>Error fetching categories. Please check your connection.</p>');
+                    }
+                });
+            }
+
+            function renderCategories() {
+                $('#categories').empty();
+                categories.forEach(function (category) {
+                    var categoryImage = category.image ? category.image : 'https://via.placeholder.com/150';
+                    console.log(category.id);
+                    var categoryHtml = `
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <img src="${categoryImage}" class="card-img-top" alt="${category.name}" style="width: 100%; height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">${category.name}</h5>
+                                <button class="btn btn-primary editBtn" data-id="${category._id}" onclick="editCategory('${category.id}')">Edit</button>
+                                <button class="btn btn-danger deleteBtn" data-id="${category._id}">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+                    $('#categories').append(categoryHtml);
+                });
+            }
+
+            function renderPagination(totalItems) {
+                var totalPages = Math.ceil(totalItems / categoriesPerPage);
+                $('#pagination').empty();
+                var paginationHtml = '<ul class="pagination">';
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#">${i}</a></li>`;
+                }
+                paginationHtml += '</ul>';
+                $('#pagination').html(paginationHtml);
+            }
+
+
+            $(document).on('click', '.page-link', function (e) {
+                e.preventDefault();
+                var selectedPage = parseInt($(this).text());
+                if (!isNaN(selectedPage) && selectedPage !== currentPage) {
+                    currentPage = selectedPage;
+                    fetchCategories();
+                }
+            });
+
+            $('#categories').on('click', '.deleteBtn', function () {
+                var categoryId = $(this).data('id');
+                if (confirm('Are you sure you want to delete this category?')) {
+                    $.ajax({
+                        url: '/api/v1/categorys/' + categoryId,
+                        type: 'DELETE',
+                        success: function (result) {
+                            alert('Category deleted successfully');
+                            location.reload();
+                        },
+                        error: function (request, status, error) {
+                            alert('Error deleting category: ' + error);
+                        }
+                    });
+                }
+            });
+
+            function addCategory() {
+                window.location.href = '/add-category'; // Assumed path for adding a new category
+            }
+
+            function editCategory(categoryId) {
+                window.location.href = '/edit-category/' + categoryId; // Assumed path for editing a category
+            }
+
+            $('body').on('click', '.btn-success', addCategory);
+            $('body').on('click', '.editBtn', function () {
+                var categoryId = $(this).data('id');
+                editCategory(categoryId);
+            });
+
+            fetchCategories();
+        });
+        $(function () {
+            $("#navbar-placeholder").load("./views/layout/navbar.html");
+            $("#footer-placeholder").load("./views/layout/footer.html");
+        });
+    </script>
+</body>
+
+</html>
